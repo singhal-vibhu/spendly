@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, abort
-from database.db import get_db, init_db, seed_db, create_user
+from flask import Flask, render_template, request, flash, redirect, url_for, abort, session
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from werkzeug.security import check_password_hash
 import sqlite3
 
 app = Flask(__name__)
@@ -46,8 +47,30 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        # Validate required fields
+        if not email or not password:
+            flash("All fields are required", "error")
+            return render_template("login.html", error="All fields are required")
+
+        # Look up user by email
+        user = get_user_by_email(email)
+
+        # Verify password using werkzeug
+        if user and check_password_hash(user["password_hash"], password):
+            session["user_id"] = user["id"]
+            flash("Welcome back!", "success")
+            return redirect(url_for("landing"))
+        else:
+            flash("Invalid email or password", "error")
+            return render_template("login.html", error="Invalid email or password")
+
+    # GET request
     return render_template("login.html")
 
 
@@ -67,7 +90,9 @@ def privacy():
 
 @app.route("/logout")
 def logout():
-    return "Logout — coming in Step 3"
+    session.clear()
+    flash("You have been logged out", "success")
+    return redirect(url_for("landing"))
 
 
 @app.route("/profile")

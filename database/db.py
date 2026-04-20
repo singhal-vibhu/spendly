@@ -118,3 +118,26 @@ def create_user(name, email, password):
     conn.close()
 
     return user_id
+
+
+def get_user_by_email(email):
+    """Find a user by email address.
+
+    Args:
+        email: User's email address
+
+    Returns:
+        sqlite3.Row containing user data, or None if not found
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT id, name, email, password_hash FROM users WHERE email = ?",
+        (email,)
+    )
+
+    user = cursor.fetchone()
+    conn.close()
+
+    return user
