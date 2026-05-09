@@ -22,7 +22,111 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Navbar username                                                      */
+/* Date Filter Bar                                                         */
+/* ------------------------------------------------------------------ */
+
+.profile-filter-bar {
+    margin-bottom: 1.5rem;
+}
+
+.filter-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.preset-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: var(--paper-card);
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+}
+
+.preset-btn.active {
+    background: var(--accent);
+    color: var(--paper-card);
+    border-color: var(--accent);
+}
+
+.custom-date-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.date-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.date-input-wrapper label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.date-input-wrapper input {
+    padding: 0.4rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--paper-card);
+    color: var(--ink);
+    font-family: inherit;
+}
+
+.filter-submit-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: var(--paper-card);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.filter-submit-btn:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+    .filter-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .custom-date-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Navbar username                                                         */
 /* ------------------------------------------------------------------ */
 
 .nav-username {

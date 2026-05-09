@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timedelta
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
@@ -99,18 +100,61 @@ def logout():
     return redirect(url_for("landing"))
 
 
+def get_date_range(preset, date_from, date_to):
+    """Calculates and validates date ranges for profile filtering."""
+    today = datetime.now()
+
+    match preset:
+        case "this_month":
+            date_from = today.replace(day=1).strftime("%Y-%m-%d")
+            date_to = today.strftime("%Y-%m-%d")
+        case "last_3_months":
+            date_from = (today - timedelta(days=90)).strftime("%Y-%m-%d")
+            date_to = today.strftime("%Y-%m-%d")
+        case "last_6_months":
+            date_from = (today - timedelta(days=180)).strftime("%Y-%m-%d")
+            date_to = today.strftime("%Y-%m-%d")
+        case "all_time" | None:
+            date_from, date_to = None, None
+
+    if date_from and date_to:
+        try:
+            d_from = datetime.strptime(date_from, "%Y-%m-%d")
+            d_to = datetime.strptime(date_to, "%Y-%m-%d")
+            if d_from > d_to:
+                return None, None, "all_time", "Start date must be before end date."
+        except ValueError:
+            return None, None, "all_time", None
+
+    # Determine active preset if not set by preset param
+    active_preset = preset if preset else ("custom" if date_from and date_to else "all_time")
+
+    return date_from, date_to, active_preset, None
+
 @app.route("/profile")
 def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
     uid = session["user_id"]
+
+    active_preset = request.args.get("preset")
+    date_from = request.args.get("date_from")
+    date_to = request.args.get("date_to")
+
+    date_from, date_to, active_preset, error = get_date_range(active_preset, date_from, date_to)
+    if error:
+        flash(error, "error")
+
     return render_template(
         "profile.html",
         user=get_user_by_id(uid),
-        stats=get_summary_stats(uid),
-        expenses=get_recent_transactions(uid),
-        categories=get_category_breakdown(uid),
+        stats=get_summary_stats(uid, date_from, date_to),
+        expenses=get_recent_transactions(uid, date_from=date_from, date_to=date_to),
+        categories=get_category_breakdown(uid, date_from, date_to),
+        date_from=date_from,
+        date_to=date_to,
+        active_preset=active_preset,
     )
 
 
