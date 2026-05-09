@@ -13,7 +13,7 @@ Then write and run a Python script using Bash that:
    - Name: a realistic Indian first + last name
    - Email: derived from the name with a random 2-3 digit 
      number suffix (e.g. rahul.sharma91@gmail.com)
-   - Password: "password123" hashed with werkzeug's 
+   - Password: "1234" hashed with werkzeug's 
      generate_password_hash
    - created_at: current datetime
 
