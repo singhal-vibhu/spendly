@@ -1,4 +1,5 @@
 import sqlite3
+import math
 from datetime import datetime, timedelta
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
@@ -10,6 +11,7 @@ from database.queries import (
     get_recent_transactions,
     get_summary_stats,
     get_user_by_id,
+    insert_expense,
 )
 
 app = Flask(__name__)
@@ -18,6 +20,14 @@ app.secret_key = "dev-secret-key"
 with app.app_context():
     init_db()
     seed_db()
+
+
+
+# ------------------------------------------------------------------ #
+# Constants                                                              #
+# ------------------------------------------------------------------ #
+
+VALID_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
 
 
 # ------------------------------------------------------------------ #
@@ -158,9 +168,66 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
+@app.route("/analytics")
+def analytics():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    return render_template("analytics.html")
+
+
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        amount_str = request.form.get("amount", "").strip()
+        category = request.form.get("category", "").strip()
+        date_str = request.form.get("date", "").strip()
+        description = request.form.get("description", "").strip()
+
+        errors = []
+
+        # Amount validation
+        try:
+            amount = float(amount_str)
+            if not math.isfinite(amount) or amount <= 0:
+                errors.append("Amount must be a finite number greater than 0.")
+        except (ValueError, TypeError):
+            errors.append("Please enter a valid numeric amount.")
+
+        # Category validation
+        if not category or category not in VALID_CATEGORIES:
+            errors.append("Please select a valid category.")
+
+        # Date validation
+        if not date_str:
+            errors.append("Date is required.")
+        else:
+            try:
+                parsed_date = datetime.strptime(date_str, "%Y-%m-%d")
+                if parsed_date > datetime.now():
+                    errors.append("Expense date cannot be in the future.")
+            except ValueError:
+                errors.append("Invalid date format. Please use YYYY-MM-DD.")
+
+        if errors:
+            for error in errors:
+                flash(error, "error")
+            return render_template("add_expense.html")
+
+        # Successful validation
+        insert_expense(
+            user_id=session["user_id"],
+            amount=amount,
+            category=category,
+            date=date_str,
+            description=description if description else None,
+        )
+        flash("Expense added successfully!", "success")
+        return redirect(url_for("profile"))
+
+    return render_template("add_expense.html")
 
 
 @app.route("/expenses/<int:id>/edit")

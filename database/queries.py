@@ -3,6 +3,20 @@ from datetime import datetime
 from database.db import get_db
 
 
+def insert_expense(user_id, amount, category, date, description):
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, date, description),
+        )
+        conn.commit()
+        expense_id = cursor.lastrowid
+        return expense_id
+    finally:
+        conn.close()
+
+
 def get_user_by_id(user_id):
     conn = get_db()
     row = conn.execute(

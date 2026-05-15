@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense — Spendly{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Add Expense</h1>
+    <p>Record a new transaction to keep your finances on track.</p>
+</div>
+
+<div class="form-container">
+    <form action="{{ url_for('add_expense') }}" method="POST" class="expense-form">
+        <div class="form-group">
+            <label for="amount">Amount (₹)</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" required
+                   value="{{ request.form.get('amount', '') }}" placeholder="0.00">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="" disabled {{ 'selected' if not request.form.get('category') }}>Select Category</option>
+                {% for cat in ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"] %}
+                <option value="{{ cat }}" {{ 'selected' if request.form.get('category') == cat }}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required
+                   value="{{ request.form.get('date', '') }}">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description (Optional)</label>
+            <input type="text" id="description" name="description" maxlength="200"
+                   value="{{ request.form.get('description', '') }}" placeholder="What was this for?">
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('profile') }}" class="btn-ghost">Cancel</a>
+            <button type="submit" class="btn-primary">Save Expense</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--paper-card);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+    }
+    .expense-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .form-group label {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    .form-group input, .form-group select {
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+    }
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
