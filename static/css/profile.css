@@ -265,6 +265,21 @@
     border-bottom: 1px solid var(--border-soft);
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.section-header .section-title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
 /* ------------------------------------------------------------------ */
 /* Transaction table                                                    */
 /* ------------------------------------------------------------------ */
