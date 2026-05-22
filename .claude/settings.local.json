@@ -7,7 +7,8 @@
       "mcp__sqlite__read_query",
       "mcp__plugin_figma_figma__get_screenshot",
       "WebFetch(domain:www.figma.com)",
-      "mcp__plugin_figma_figma__get_metadata"
+      "mcp__plugin_figma_figma__get_metadata",
+      "Bash(pytest *)"
     ]
   }
 }
