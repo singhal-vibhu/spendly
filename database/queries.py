@@ -17,6 +17,29 @@ def insert_expense(user_id, amount, category, date, description):
         conn.close()
 
 
+def get_expense_by_id(expense_id, user_id):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT id, amount, category, date, description FROM expenses WHERE id = ? AND user_id = ?",
+        (expense_id, user_id),
+    ).fetchone()
+    conn.close()
+    return row
+
+
+def update_expense(expense_id, user_id, amount, category, date, description):
+    conn = get_db()
+    try:
+        conn.execute(
+            "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? WHERE id = ? AND user_id = ?",
+            (amount, category, date, description, expense_id, user_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+
 def get_user_by_id(user_id):
     conn = get_db()
     row = conn.execute(
@@ -43,7 +66,7 @@ def get_user_by_id(user_id):
 def get_recent_transactions(user_id, date_from=None, date_to=None, limit=10):
     conn = get_db()
     query = """
-        SELECT date, description, category, amount
+        SELECT id, date, description, category, amount
         FROM expenses
         WHERE user_id = ?
     """
@@ -61,6 +84,7 @@ def get_recent_transactions(user_id, date_from=None, date_to=None, limit=10):
 
     return [
         {
+            "id": row["id"],
             "date": datetime.strptime(row["date"], "%Y-%m-%d").strftime("%d %b %Y"),
             "description": row["description"],
             "category": row["category"],
